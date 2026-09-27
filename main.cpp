@@ -5,10 +5,10 @@
 #include <BleKeyboard.h>
 
 // ================= PINAGEM ESP32 (30 PINOS) =================
-const int PIN_POT        = 36; // GPIO36 (VP - Potenciômetro)
+const int PIN_POT        = 36; // GPIO36 (VP - Potenciômetro ADC1)
 const int PIN_BOTAO      = 32; // GPIO32 (Push Button com INPUT_PULLUP)
 const int PIN_LASER      = 33; // GPIO33 (Módulo Mini Laser)
-const int PIN_BUZZER     = 25; // GPIO25 (Buzzer)
+const int PIN_BUZZER     = 25; // GPIO25 (Buzzer Piezoelétrico)
 const int PIN_LED_VERDE  = 26; // GPIO26 (LED Verde - Concluído/Pronto)
 const int PIN_LED_AMAR   = 27; // GPIO27 (LED Amarelo - Girando/Estabilizando)
 const int PIN_LED_VERM   = 14; // GPIO14 (LED Vermelho - Captura de Foto)
@@ -22,12 +22,11 @@ const int PIN_IN4        = 17;
 // Display LCD 16x2 I2C
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
-// Motor 28BYJ-48 (2048 passos por volta de 360°)
+// Motor 28BYJ-48 (2048 passos por volta completa)
 const int PASSOS_VOLTA_COMPLETA = 2048;
 Stepper motorPasso(PASSOS_VOLTA_COMPLETA, PIN_IN1, PIN_IN3, PIN_IN2, PIN_IN4);
 
 // ============ BLUETOOTH BLE SHUTTER ============
-// Nome que vai aparecer no Bluetooth do celular
 BleKeyboard bleKeyboard("Scanner 3D Shutter", "ESP32", 100);
 
 // ============ MÁQUINA DE ESTADOS ============
@@ -51,9 +50,10 @@ int cliquesNaPausa = 0;
 const unsigned long JANELA_DUPLO_CLIQUE = 450;
 
 int ultimaLeituraPot = -999;
+bool ultimoStatusBle = false;
 unsigned long tempoAtualizacaoPot = 0;
 
-// Funções auxiliares
+// Protótipos das funções
 void definirLeds(bool vermelho, bool amarelo, bool verde);
 void desenergizarMotor();
 void bipFoto();
@@ -124,7 +124,7 @@ void loop() {
       digitalWrite(PIN_LASER, LOW);
 
       while (fotoAtual <= totalPassos) {
-        // 1. Calcula passos do motor
+        // 1. Calcula passos acumulados absolutos do motor
         long posicaoAlvoPassos = round((fotoAtual - 1) * ((float)PASSOS_VOLTA_COMPLETA / totalPassos));
         long passosParaGirar = posicaoAlvoPassos - passosAcumulados;
 
@@ -154,7 +154,7 @@ void loop() {
 
         lcd.setCursor(0, 1);
         lcd.print(anguloAtual);
-        lcd.print((char)223);
+        lcd.print((char)223); // Símbolo de grau
         lcd.print(bleKeyboard.isConnected() ? " [BLE:ON]" : " [BLE:--]");
 
         // 3. Estabilização mecânica (600ms para zerar trepidações)
@@ -207,7 +207,6 @@ void loop() {
 // ============= DISPARADOR BLUETOOTH BLE =============
 void dispararCameraCelular() {
   if (bleKeyboard.isConnected()) {
-    // Envia o comando Volume + (Shutter universal de câmera)
     bleKeyboard.write(KEY_MEDIA_VOLUME_UP);
     Serial.println(">>> FOTO DISPARADA VIA BLUETOOTH <<<");
   } else {
@@ -224,7 +223,10 @@ void retornarAoPontoZero() {
     lcd.setCursor(0, 1);
     lcd.print("Voltando p/ 0");
 
+    motorPasso.setSpeed(8); // Velocidade suave no retorno
     motorPasso.step(-passosAcumulados);
+    motorPasso.setSpeed(12);
+
     passosAcumulados = 0;
     desenergizarMotor();
   }
@@ -234,6 +236,8 @@ void atualizarPassosPotenciometro(bool forcarExibicao) {
   if (!forcarExibicao && (millis() - tempoAtualizacaoPot < 120)) return;
   tempoAtualizacaoPot = millis();
 
+  bool statusBleAtual = bleKeyboard.isConnected();
+
   long soma = 0;
   for (int i = 0; i < 10; i++) {
     soma += analogRead(PIN_POT);
@@ -241,16 +245,19 @@ void atualizarPassosPotenciometro(bool forcarExibicao) {
   }
   int leituraMedia = soma / 10;
 
-  if (abs(leituraMedia - ultimaLeituraPot) > 50 || forcarExibicao) {
+  bool bleMudou = (statusBleAtual != ultimoStatusBle);
+
+  if (abs(leituraMedia - ultimaLeituraPot) > 50 || forcarExibicao || bleMudou) {
     ultimaLeituraPot = leituraMedia;
+    ultimoStatusBle = statusBleAtual;
     int passosCalculados = map(leituraMedia, 0, 4095, 8, 36);
 
-    if (passosCalculados != totalPassos || forcarExibicao) {
+    if (passosCalculados != totalPassos || forcarExibicao || bleMudou) {
       totalPassos = passosCalculados;
 
       lcd.clear();
       lcd.setCursor(0, 0);
-      lcd.print(bleKeyboard.isConnected() ? "BLE CONECTADO :)" : "PAREAR BLUETOOTH");
+      lcd.print(statusBleAtual ? "BLE CONECTADO :)" : "PAREAR BLUETOOTH");
       lcd.setCursor(0, 1);
       lcd.print("FOTOS: ");
       lcd.print(totalPassos);
