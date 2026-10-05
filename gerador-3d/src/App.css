@@ -23,13 +23,13 @@ body {
 }
 
 .page {
-  max-width: 720px;
+  max-width: 760px;
   margin: 0 auto;
-  padding: 48px 24px 80px;
+  padding: 40px 24px 80px;
 }
 
 .site-header {
-  margin-bottom: 40px;
+  margin-bottom: 28px;
 }
 
 .brand {
@@ -37,7 +37,7 @@ body {
   align-items: center;
   gap: 8px;
   color: var(--accent);
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 .brand-name {
@@ -51,26 +51,199 @@ body {
 .site-header h1 {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 600;
-  font-size: 2.25rem;
+  font-size: 2.2rem;
   line-height: 1.15;
-  margin: 0 0 12px;
-  max-width: 14ch;
+  margin: 0 0 10px;
 }
 
 .lede {
   font-size: 1.05rem;
   line-height: 1.5;
   color: var(--ink-muted);
-  max-width: 46ch;
+  max-width: 50ch;
   margin: 0;
+}
+
+/* Navegação por Abas */
+.tab-nav {
+  display: flex;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px;
+  gap: 4px;
+  margin-bottom: 28px;
+}
+
+.tab-btn {
+  flex: 1;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 10px 12px;
+  border-radius: calc(var(--radius) - 2px);
+  border: none;
+  background: transparent;
+  color: var(--ink-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.tab-btn:hover {
+  color: var(--ink);
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.tab-btn.active {
+  background: var(--accent);
+  color: var(--accent-ink);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .content {
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 24px;
 }
 
+.tab-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Dropzone de Arquivo 3D */
+.model-dropzone {
+  background: var(--surface);
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 32px 24px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.model-dropzone:hover,
+.model-dropzone.dragging {
+  border-color: var(--accent);
+  background: rgba(12, 124, 114, 0.03);
+}
+
+.dropzone-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.dropzone-icon {
+  color: var(--accent);
+}
+
+.dropzone-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dropzone-text strong {
+  font-size: 1.05rem;
+  color: var(--ink);
+}
+
+.dropzone-hint {
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+}
+
+/* Luma Form e Viewer */
+.luma-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.luma-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.luma-input-group {
+  display: flex;
+  gap: 8px;
+}
+
+.luma-input {
+  flex: 1;
+  font: inherit;
+  font-size: 0.95rem;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.luma-input:focus {
+  border-color: var(--accent);
+}
+
+.luma-submit-btn {
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 12px 20px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.luma-submit-btn:hover {
+  opacity: 0.9;
+}
+
+.luma-help {
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+  margin: 0;
+}
+
+.luma-help a {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.luma-stage {
+  padding: 0 !important;
+  overflow: hidden;
+  height: 480px;
+}
+
+.luma-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+.luma-tip {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+}
+
+/* Seções de Captura e Galeria */
 .capture {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -172,11 +345,6 @@ body {
   color: var(--accent);
 }
 
-.preview-remove:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
 .generate {
   display: flex;
   flex-direction: column;
@@ -204,11 +372,6 @@ body {
 
 .generate-button:not(:disabled):hover {
   opacity: 0.9;
-}
-
-.generate-button:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
 }
 
 .status-line {
@@ -250,14 +413,7 @@ body {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .status-uploading::before,
-  .status-queued::before,
-  .status-processing::before {
-    animation: none;
-  }
-}
-
+/* Visualizador 3D */
 .viewer {
   display: flex;
   flex-direction: column;
@@ -265,7 +421,7 @@ body {
 }
 
 .viewer-stage {
-  min-height: 320px;
+  min-height: 380px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background-color: var(--surface);
@@ -280,14 +436,14 @@ body {
 
 .viewer-empty {
   color: var(--ink-muted);
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   margin: 0;
   text-align: center;
 }
 
 .viewer-canvas {
   width: 100%;
-  height: 380px;
+  height: 420px;
   border-radius: var(--radius);
   overflow: hidden;
 }
@@ -302,13 +458,21 @@ body {
   white-space: nowrap;
 }
 
+.model-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
 .viewer-download {
-  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
   font-size: 0.9rem;
   font-weight: 600;
   color: var(--accent);
   text-decoration: none;
   border: 1px solid var(--border);
+  background: var(--surface);
   border-radius: var(--radius);
   padding: 10px 16px;
 }
@@ -317,6 +481,23 @@ body {
   border-color: var(--accent);
 }
 
+.clear-model-btn {
+  font: inherit;
+  font-size: 0.9rem;
+  color: #b3261e;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 16px;
+  cursor: pointer;
+}
+
+.clear-model-btn:hover {
+  background: rgba(179, 38, 30, 0.05);
+  border-color: #b3261e;
+}
+
+/* Modal de Câmera */
 .camera-modal {
   position: fixed;
   inset: 0;
@@ -346,7 +527,7 @@ body {
   object-fit: cover;
   border-radius: var(--radius);
   background: #000;
-  transform: scaleX(-1); /* espelha o preview, como a maioria das câmeras frontais faz */
+  transform: scaleX(-1);
 }
 
 .camera-error {
@@ -418,19 +599,16 @@ body {
   color: var(--accent);
 }
 
-@media (max-width: 520px) {
+@media (max-width: 600px) {
   .capture {
     grid-template-columns: 1fr;
   }
 
+  .tab-nav {
+    flex-direction: column;
+  }
+
   .site-header h1 {
     font-size: 1.75rem;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .capture-tile,
-  .generate-button {
-    transition: none;
   }
 }
